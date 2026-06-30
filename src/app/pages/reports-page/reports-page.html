@@ -1,0 +1,100 @@
+<section class="page-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Reports</p>
+      <h1>Read the business without digging through spreadsheets.</h1>
+      <p>Compare inventory, channel mix, and selling efficiency so buying decisions stay sharp.</p>
+    </div>
+  </header>
+
+  <section class="metric-grid">
+    <article class="metric-card accent">
+      <span>Revenue</span>
+      <strong>{{ store.revenue() | currency: 'USD' : 'symbol' : '1.0-0' }}</strong>
+      <p>Sales captured across all channels.</p>
+    </article>
+
+    <article class="metric-card">
+      <span>Estimated margin</span>
+      <strong>{{ store.estimatedMargin() | currency: 'USD' : 'symbol' : '1.0-0' }}</strong>
+      <p>Revenue after direct product cost.</p>
+    </article>
+
+    <article class="metric-card warm">
+      <span>Sell-through</span>
+      <strong>{{ store.sellThroughRate() | percent: '1.0-0' }}</strong>
+      <p>How much stock has already moved.</p>
+    </article>
+
+    <article class="metric-card">
+      <span>Low stock items</span>
+      <strong>{{ store.lowStockProducts().length }}</strong>
+      <p>Styles that need a replenishment decision.</p>
+    </article>
+  </section>
+
+  <section class="report-grid">
+    <article class="panel">
+      <div class="panel-heading">
+        <h2>Category mix</h2>
+        <p>Unit share by assortment category.</p>
+      </div>
+
+      <div class="bar-list">
+        @for (item of store.categoryBreakdown(); track item.category) {
+          <div class="bar-row">
+            <div class="bar-label">
+              <span>{{ item.category }}</span>
+              <strong>{{ item.units }} units</strong>
+            </div>
+            <div class="bar-track">
+              <span class="bar-fill" [style.width.%]="item.share"></span>
+            </div>
+          </div>
+        }
+      </div>
+    </article>
+
+    <article class="panel">
+      <div class="panel-heading">
+        <h2>Channel mix</h2>
+        <p>Sales value by selling channel.</p>
+      </div>
+
+      <div class="bar-list">
+        @for (item of store.channelBreakdown(); track item.channel) {
+          <div class="bar-row">
+            <div class="bar-label">
+              <span>{{ item.channel }}</span>
+              <strong>{{ item.total | currency: 'USD' : 'symbol' : '1.0-0' }}</strong>
+            </div>
+            <div class="bar-track warm">
+              <span class="bar-fill warm" [style.width.%]="item.share"></span>
+            </div>
+          </div>
+        }
+      </div>
+    </article>
+  </section>
+
+  <article class="panel span-wide">
+    <div class="panel-heading">
+      <h2>Current action list</h2>
+      <p>Items that need attention right now.</p>
+    </div>
+
+    <div class="action-list">
+      @for (product of store.lowStockProducts(); track product._id) {
+        <div class="action-row">
+          <div>
+            <strong>{{ product.name }}</strong>
+            <p>{{ product.category }} · reorder at {{ product.reorderPoint }}</p>
+          </div>
+          <span class="status" [class.critical]="product.status === 'Critical'">
+            {{ product.status }}
+          </span>
+        </div>
+      }
+    </div>
+  </article>
+</section>

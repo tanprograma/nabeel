@@ -1,0 +1,85 @@
+<div class="app-shell" [class.stop-overflow]="store.Notification().loading">
+  @if (store.Notification().loading) {
+    <div
+      class="spinner-container"
+      [class.spinner-container--error]="store.Notification().fetch_status == 'error'"
+    >
+      @if (store.Notification().loading && store.Notification().fetch_status != 'error') {
+        <div class="spinner"></div>
+        <div class="spinner"></div>
+        <div class="spinner"></div>
+      } @else {
+        <div class="notification-controls">
+          <button class="notification-btn" (click)="store.retry()">retry</button>
+        </div>
+        <div class="notification-controls danger">
+          <button class="notification-btn" (click)="store.resetNotification()">close</button>
+        </div>
+      }
+    </div>
+  }
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">NA</div>
+      <div>
+        <span>Nabeel Atelier</span>
+        <small>Inventory, purchasing, and sales</small>
+      </div>
+    </div>
+
+    <nav aria-label="Primary" class="sidebar-nav">
+      @for (item of navItems; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <strong>{{ item.label }}</strong>
+          <span>{{ item.note }}</span>
+        </a>
+      }
+    </nav>
+
+    <section class="sidebar-card">
+      <p class="eyebrow">Live snapshot</p>
+      <div class="facts">
+        @for (fact of facts(); track fact.label) {
+          <article>
+            <span>{{ fact.label }}</span>
+            <strong>{{ fact.value }}</strong>
+          </article>
+        }
+      </div>
+    </section>
+
+    <p class="sidebar-footnote">
+      Built for an apparel shop that needs clear stock, supplier, and checkout visibility.
+    </p>
+  </aside>
+
+  <div class="workspace">
+    <header class="workspace-header">
+      <div>
+        <p class="eyebrow">Apparel shop operations</p>
+        <h1>Command center</h1>
+        <p class="lede">
+          Manage inventory, purchasing, and sales with a single live view that stays calm under
+          pressure.
+        </p>
+      </div>
+
+      <div class="header-badges">
+        @for (fact of facts(); track fact.label) {
+          <article>
+            <span>{{ fact.label }}</span>
+            <strong>{{ fact.value }}</strong>
+          </article>
+        }
+      </div>
+    </header>
+
+    <main class="workspace-panel">
+      <router-outlet />
+    </main>
+  </div>
+</div>

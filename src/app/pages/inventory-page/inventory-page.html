@@ -1,0 +1,157 @@
+<section class="page-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Inventory control</p>
+      <h1>Keep every style in the right size curve.</h1>
+      <p>
+        Add new products, top up fast sellers, and monitor which styles are slipping toward a
+        reorder point.
+      </p>
+    </div>
+
+    @if (message()) {
+      <div class="message-pill">{{ message() }}</div>
+    }
+  </header>
+
+  <section class="panel-grid">
+    <article class="panel">
+      <div class="panel-heading">
+        <h2>Add product</h2>
+        <p>Register a new SKU and prime the starting stock.</p>
+      </div>
+
+      <form [formGroup]="addProductForm" (ngSubmit)="addProduct()" class="form-grid">
+        <label>
+          <span>SKU</span>
+          <input type="text" formControlName="sku" />
+        </label>
+        <label>
+          <span>Product name</span>
+          <input type="text" formControlName="name" />
+        </label>
+        <label>
+          <span>Category</span>
+          <select formControlName="category">
+            <option>Shirts</option>
+            <option>Trousers</option>
+            <option>Outerwear</option>
+            <option>Knits</option>
+            <option>Bottoms</option>
+            <option>Accessories</option>
+          </select>
+        </label>
+        <label>
+          <span>Season</span>
+          <select formControlName="season">
+            <option>Core</option>
+            <option>Spring</option>
+            <option>Summer</option>
+            <option>Autumn</option>
+            <option>Winter</option>
+          </select>
+        </label>
+        <label>
+          <span>Starting stock</span>
+          <input type="number" min="0" formControlName="stock" />
+        </label>
+        <label>
+          <span>Reorder point</span>
+          <input type="number" min="0" formControlName="reorderPoint" />
+        </label>
+        <label>
+          <span>Cost</span>
+          <input type="number" min="1" step="1" formControlName="cost" />
+        </label>
+        <label>
+          <span>Retail price</span>
+          <input type="number" min="1" step="1" formControlName="price" />
+        </label>
+        <label class="span-2">
+          <span>Supplier</span>
+          <input type="text" formControlName="supplier" />
+        </label>
+
+        <button type="submit" class="primary-btn">Add product</button>
+      </form>
+    </article>
+
+    <article class="panel">
+      <div class="panel-heading">
+        <h2>Restock</h2>
+        <p>Push inventory back up and automatically log a purchase receipt.</p>
+      </div>
+
+      <form [formGroup]="restockForm" (ngSubmit)="restockProduct()" class="form-grid compact">
+        <label class="span-2">
+          <span>Product</span>
+          <select formControlName="productId">
+            @for (product of store.products(); track product._id) {
+              <option [value]="product._id">
+                {{ product.name }} · {{ product.stock }} on hand
+              </option>
+            }
+          </select>
+        </label>
+        <label class="span-2">
+          <span>Units to add</span>
+          <input type="number" min="1" formControlName="units" />
+        </label>
+        <button type="submit" class="secondary-btn">Receive stock</button>
+      </form>
+
+      <div class="inventory-note">
+        <p>
+          Current inventory value:
+          {{ store.inventoryValue() | currency: 'USD' : 'symbol' : '1.0-0' }}
+        </p>
+      </div>
+    </article>
+  </section>
+
+  <article class="panel">
+    <div class="panel-heading">
+      <h2>Product register</h2>
+      <p>All active styles with stock, pricing, and supplier context.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Product</th>
+            <th>Category</th>
+            <th>Stock</th>
+            <th>Price</th>
+            <th>Supplier</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (product of store.products(); track product._id) {
+            <tr>
+              <td>{{ product.sku }}</td>
+              <td>
+                <strong>{{ product.name }}</strong>
+                <span>{{ product.season }}</span>
+              </td>
+              <td>{{ product.category }}</td>
+              <td>
+                <strong>{{ product.stock }}</strong>
+                <span>Reorder at {{ product.reorderPoint }}</span>
+              </td>
+              <td>{{ product.price | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+              <td>{{ product.supplier }}</td>
+              <td>
+                <span class="status" [class.critical]="product.status === 'Critical'">
+                  {{ product.status }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>

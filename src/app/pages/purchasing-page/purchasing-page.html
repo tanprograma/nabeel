@@ -1,0 +1,123 @@
+<section class="page-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Purchasing</p>
+      <h1>Bring the right fabric and sizes back into stock.</h1>
+      <p>
+        Build purchase receipts, lock supplier details, and keep inbound flow visible to the team.
+      </p>
+    </div>
+
+    @if (message()) {
+      <div class="message-pill">{{ message() }}</div>
+    }
+  </header>
+
+  <section class="panel-grid">
+    <article class="panel">
+      <div class="panel-heading">
+        <h2>New purchase order</h2>
+        <p>Record a supplier receipt and automatically push stock back up.</p>
+      </div>
+
+      <form [formGroup]="purchaseForm" (ngSubmit)="submitPurchase()" class="form-grid">
+        <label class="span-2">
+          <span>Product</span>
+          <select formControlName="productId">
+            @for (product of store.products(); track product._id) {
+              <option [value]="product._id">{{ product.name }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          <span>Supplier</span>
+          <input type="text" formControlName="supplier" />
+        </label>
+        <label>
+          <span>Order date</span>
+          <input type="date" formControlName="orderedOn" />
+        </label>
+        <label>
+          <span>Units</span>
+          <input type="number" min="1" formControlName="units" />
+        </label>
+        <label>
+          <span>Cost per unit</span>
+          <input type="number" min="1" step="1" formControlName="costPerUnit" />
+        </label>
+        <label>
+          <span>Status</span>
+          <select formControlName="status">
+            <option>Ordered</option>
+            <option>In transit</option>
+            <option>Received</option>
+          </select>
+        </label>
+
+        <button type="submit" class="primary-btn span-2">Save purchase</button>
+      </form>
+    </article>
+
+    <article class="panel info-panel">
+      <div class="panel-heading">
+        <h2>Receiving rules</h2>
+        <p>Use one purchase order per style and supplier lot.</p>
+      </div>
+
+      <div class="info-stack">
+        <div>
+          <strong>{{ store.lowStockProducts().length }}</strong>
+          <span>products need replenishment</span>
+        </div>
+        <div>
+          <strong>{{ store.purchaseSpend() | currency: 'USD' : 'symbol' : '1.0-0' }}</strong>
+          <span>current buying spend</span>
+        </div>
+        <div>
+          <strong>{{ store.purchases().length }}</strong>
+          <span>purchase orders on file</span>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <article class="panel">
+    <div class="panel-heading">
+      <h2>Inbound history</h2>
+      <p>Latest purchase receipts and status changes.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Supplier</th>
+            <th>Units</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of store.purchases(); track order._id) {
+            <tr>
+              <td>
+                <strong>{{ order.item.name }}</strong>
+              </td>
+              <td>{{ order.supplier }}</td>
+              <td>{{ order.units }}</td>
+              <td>{{ order.total | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+              <td>
+                <span class="status" [class.pending]="order.status === 'Ordered'">
+                  {{ order.status }}
+                </span>
+              </td>
+              <td>{{ order.orderedOn | date: 'MMM d, y' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>

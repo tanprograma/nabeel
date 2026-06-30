@@ -1,0 +1,136 @@
+<section class="page-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Sales</p>
+      <h1>Capture every checkout, web order, and wholesale drop.</h1>
+      <p>
+        Log sales against live stock, spot size runs that are moving quickly, and keep the floor
+        responsive.
+      </p>
+    </div>
+
+    @if (message()) {
+      <div class="message-pill">{{ message() }}</div>
+    }
+  </header>
+
+  <section class="panel-grid">
+    <article class="panel">
+      <div class="panel-heading">
+        <h2>New sale</h2>
+        <p>Record a sale against the current product register.</p>
+      </div>
+
+      <form [formGroup]="saleForm" (ngSubmit)="submitSale()" class="form-grid">
+        <label class="span-2">
+          <span>Product</span>
+          <select formControlName="productId" (change)="prefillPrice()">
+            @for (product of store.products(); track product._id) {
+              <option [value]="product._id">{{ product.name }} · {{ product.stock }} stock</option>
+            }
+          </select>
+        </label>
+        <label>
+          <span>Channel</span>
+          <select formControlName="channel">
+            <option>Retail</option>
+            <option>Online</option>
+            <option>Wholesale</option>
+          </select>
+        </label>
+        <label>
+          <span>Sale date</span>
+          <input type="date" formControlName="soldOn" />
+        </label>
+        <label>
+          <span>Units</span>
+          <input type="number" min="1" formControlName="units" />
+        </label>
+        <label>
+          <span>Price per unit</span>
+          <input type="number" min="1" step="1" formControlName="pricePerUnit" />
+        </label>
+        <label>
+          <span>Status</span>
+          <select formControlName="state">
+            <option>Paid</option>
+            <option>Pending</option>
+            <option>Returned</option>
+          </select>
+        </label>
+
+        <button type="submit" class="primary-btn span-2">Record sale</button>
+      </form>
+    </article>
+
+    <article class="panel info-panel">
+      <div class="panel-heading">
+        <h2>Demand check</h2>
+        <p>Watch the live stock on the currently selected style.</p>
+      </div>
+
+      <div class="demand-card">
+        <strong>{{ selectedProduct?.name ?? 'Choose a product' }}</strong>
+        <p>
+          @if (selectedProduct) {
+            {{ selectedProduct.stock }} units on hand at
+            {{ selectedProduct.price | currency: 'USD' : 'symbol' : '1.0-0' }}
+          } @else {
+            Pick a product to see stock and pricing context.
+          }
+        </p>
+      </div>
+
+      <div class="info-stack">
+        <div>
+          <strong>{{ store.revenue() | currency: 'USD' : 'symbol' : '1.0-0' }}</strong>
+          <span>live sales revenue</span>
+        </div>
+        <div>
+          <strong>{{ store.sales().length }}</strong>
+          <span>orders captured in the register</span>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <article class="panel">
+    <div class="panel-heading">
+      <h2>Recent sales</h2>
+      <p>Most recent checkout activity and order states.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Channel</th>
+            <th>Units</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (sale of store.sales(); track sale._id) {
+            <tr>
+              <td>
+                <strong>{{ sale.item.name }}</strong>
+              </td>
+              <td>{{ sale.channel }}</td>
+              <td>{{ sale.units }}</td>
+              <td>{{ sale.total | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+              <td>
+                <span class="status" [class.pending]="sale.state === 'Pending'">
+                  {{ sale.state }}
+                </span>
+              </td>
+              <td>{{ sale.soldOn | date: 'MMM d, y' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>
