@@ -15,7 +15,7 @@ export interface Product {
 }
 
 export interface PurchaseOrder {
-  id: number;
+  _id: mongoose.Types.ObjectId;
   supplier: string;
   item: mongoose.Types.ObjectId;
   units: number;
@@ -25,7 +25,7 @@ export interface PurchaseOrder {
 }
 
 export interface SaleOrder {
-  id: number;
+  _id: mongoose.Types.ObjectId;
   channel: 'Retail' | 'Online' | 'Wholesale';
   item: mongoose.Types.ObjectId;
   units: number;
@@ -59,7 +59,7 @@ export interface NewProductInput {
 }
 
 export interface NewPurchaseInput {
-  productId: number;
+  productId: string;
   supplier: string;
   units: number;
   costPerUnit: number;

@@ -17,8 +17,11 @@ import {
   NewPurchaseInput,
   NewSaleInput,
   Product,
+  PurchaseOrder,
+  SaleOrder,
 } from './apparel.models';
 import { HttpService } from './http-service';
+import { AnyCatcher } from 'rxjs/internal/AnyCatcher';
 type NotificationCallback = (v: any) => void;
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('en-US', {
@@ -185,15 +188,20 @@ export class ApparelStoreService {
       });
   }
 
-  recordSale(input: NewSaleInput) {
+  recordSale(input: Partial<SaleOrder>) {
     this.showLoad();
     this.http
       .post('/api/sales', input)
-      .then((res) => {
+      .then((res: any) => {
         this.state.update((state) => {
           return {
             ...state,
             sales: [...state.sales, res],
+            products: state.products.map((product) => {
+              return product._id == input.item
+                ? { ...product, stock: product.stock - res.units }
+                : product;
+            }),
           };
         });
         this.resetNotification();
@@ -206,15 +214,20 @@ export class ApparelStoreService {
         };
       });
   }
-  recordPurchase(input: NewPurchaseInput): void {
+  recordPurchase(input: PurchaseOrder): void {
     this.showLoad();
     this.http
       .post('/api/purchases', input)
-      .then((res) => {
+      .then((res: any) => {
         this.state.update((state) => {
           return {
             ...state,
             purchases: [...state.purchases, res],
+            products: state.products.map((product) => {
+              return product._id == input.item
+                ? { ...product, stock: product.stock + res.units }
+                : product;
+            }),
           };
         });
         this.resetNotification();
@@ -235,10 +248,7 @@ export class ApparelStoreService {
   getProduct(productId: string): Product | undefined {
     return this.products().find((entry) => entry._id === productId);
   }
-
-  formatMoney(value: number): string {
-    return formatCurrency(value);
-  }
+  patchProductState(id: string) {}
 
   refreshFromBackend(): void {
     this.http
@@ -272,6 +282,9 @@ export class ApparelStoreService {
   }
   stopLoad(message = 'loading....') {
     this.Notification.update((state) => ({ ...state, loading: false }));
+  }
+  formatMoney(value: number) {
+    return formatCurrency(value);
   }
   retry: any = () => console.log('done');
 }

@@ -19,10 +19,10 @@ export class PurchasingPage {
   private readonly fb = inject(FormBuilder);
 
   readonly purchaseForm = this.fb.nonNullable.group({
-    productId: [1, [Validators.required]],
+    productId: ['', [Validators.required]],
     supplier: ['North Looms'],
-    units: [12, [Validators.required, Validators.min(1)]],
-    costPerUnit: [24, [Validators.required, Validators.min(1)]],
+    units: [1, [Validators.required, Validators.min(1)]],
+    costPerUnit: [1, [Validators.required, Validators.min(1)]],
     status: ['Received'],
     orderedOn: [this.today, [Validators.required]],
   });
@@ -37,8 +37,8 @@ export class PurchasingPage {
 
     this.message.set('Purchase recorded and inventory has been replenished.');
     this.purchaseForm.patchValue({
-      units: 12,
-      costPerUnit: 24,
+      units: 1,
+      costPerUnit: 1,
       status: 'Ordered',
       orderedOn: this.today,
     });

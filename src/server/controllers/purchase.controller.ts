@@ -8,7 +8,7 @@ export const createPurchaseOrder = async (req: Request, res: Response) => {
     const doc = await PurchaseOrderModel.create(req.body);
     const purchaseOrder = await PurchaseOrderModel.findOne({ _id: doc._id });
 
-    await ProductModel.findOneAndUpdate(
+    const product = await ProductModel.findOneAndUpdate(
       { _id: req.body.item },
       { $inc: { stock: req.body.units }, cost: req.body.total / req.body.units },
       {
@@ -16,7 +16,9 @@ export const createPurchaseOrder = async (req: Request, res: Response) => {
       },
     );
 
-    res.status(201).json(purchaseOrder);
+    res
+      .status(201)
+      .json({ ...purchaseOrder?.toObject(), item: { name: product?.name, _id: product?._id } });
   } catch (error) {
     res.status(400).json({ message: 'Error creating purchase order', error });
   }
