@@ -13,6 +13,7 @@ import {
   ApparelSnapshot,
   CategoryBreakdown,
   ChannelBreakdown,
+  DetailedReportData,
   NewProductInput,
   NewPurchaseInput,
   NewSaleInput,
@@ -22,6 +23,7 @@ import {
 } from './apparel.models';
 import { HttpService } from './http-service';
 import { AnyCatcher } from 'rxjs/internal/AnyCatcher';
+import { startupSnapshot } from 'node:v8';
 type NotificationCallback = (v: any) => void;
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('en-US', {
@@ -39,13 +41,16 @@ export class ApparelStoreService {
     products: any[];
     purchases: any[];
     sales: any[];
+    detailedReportData: { start: string; end: string; data: DetailedReportData[] };
     // snapshot: any;
   }>({
     products: [],
     purchases: [],
     sales: [],
+    detailedReportData: { start: '', end: '', data: [] },
     // snapshot: {},
   });
+
   Notification = signal<{ fetch_status: 'success' | 'error' | 'rested'; loading: boolean }>({
     fetch_status: 'rested',
     loading: false,
@@ -59,7 +64,7 @@ export class ApparelStoreService {
   readonly products = computed(() => this.state().products);
   readonly purchases = computed(() => this.state().purchases);
   readonly sales = computed(() => this.state().sales);
-
+  readonly detailedReportData = computed(() => this.state().detailedReportData);
   readonly revenue = computed(() => this.sales().reduce((total, sale) => total + sale.total, 0));
 
   readonly purchaseSpend = computed(() =>
@@ -73,6 +78,31 @@ export class ApparelStoreService {
   readonly totalUnits = computed(() =>
     this.products().reduce((total, product) => total + product.stock, 0),
   );
+  getInitialDates() {
+    const end = new Date().toISOString();
+    const start = new Date();
+    start.setDate(start.getDate() - 6);
+    this.setReportDates(start.toISOString(), end);
+    // this.state.update((state) => ({
+    //   ...state,
+    //   detailedReportData: { ...state.detailedReportData, start: start.toISOString(), end: end },
+    // }));
+  }
+  setReportDates(start: string, end: string) {
+    this.state.update((state) => ({
+      ...state,
+      detailedReportData: {
+        ...state.detailedReportData,
+        start: new Date(start).toISOString(),
+        end: new Date(end).toISOString(),
+      },
+    }));
+  }
+  getInitialReportData() {
+    this.getInitialDates();
+    const { start, end } = this.state().detailedReportData;
+    this.getDetailedReportData(start, end);
+  }
 
   readonly lowStockProducts = computed(() =>
     [...this.products()]
@@ -240,6 +270,27 @@ export class ApparelStoreService {
         };
       });
   }
+  getDetailedReportData(start: string, end = new Date().toISOString()): void {
+    this.showLoad();
+    this.http
+      .get(`/api/detailed-report?start=${start}&end=${end}`)
+      .then((res: any) => {
+        this.state.update((state) => {
+          return {
+            ...state,
+            detailedReportData: { ...state.detailedReportData, data: res },
+          };
+        });
+        this.resetNotification();
+      })
+      .catch((err) => {
+        console.log(err.message);
+        this.showError();
+        this.retry = () => {
+          this.getDetailedReportData(start, end);
+        };
+      });
+  }
 
   productOptions(): Product[] {
     return this.products();
@@ -254,7 +305,10 @@ export class ApparelStoreService {
     this.http
       .get('/api/refresh')
       .then((response: any) => {
-        this.state.set(response);
+        this.state.set({
+          ...response,
+          detailedReportData: { ...this.state().detailedReportData, data: [] },
+        });
       })
       .catch((error) => {
         console.warn('Unable to fetch apparel snapshot from backend.', error);

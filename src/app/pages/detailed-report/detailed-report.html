@@ -1,0 +1,113 @@
+<section class="page-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Detailed App Report</p>
+      <h1>Be able to search Sales, Inventory and Purchase Data</h1>
+      <!-- <p>
+        Log sales against live stock, spot size runs that are moving quickly, and keep the floor
+        responsive.
+      </p> -->
+    </div>
+
+    <!-- @if (message()) {
+      <div class="message-pill">{{ message() }}</div>
+    } -->
+  </header>
+  <section class="panel-grid">
+    <article class="panel">
+      <div class="panel-heading">
+        <h2>Filter Sales</h2>
+        <p>Filter sales data by date range.</p>
+      </div>
+
+      <form [formGroup]="filterForm" (ngSubmit)="filterSalesReport()" class="form-grid">
+        <!-- <label class="span-2">
+          <span>Product</span>
+          <select formControlName="productId" (change)="prefillPrice()">
+            @for (product of store.products(); track product._id) {
+              <option [value]="product._id">{{ product.name }} · {{ product.stock }} stock</option>
+            }
+          </select>
+        </label> -->
+
+        <label>
+          <span>Start date</span>
+          <input type="date" formControlName="start" />
+        </label>
+        <label>
+          <span>End date</span>
+          <input type="date" formControlName="end" />
+        </label>
+
+        <button type="submit" class="primary-btn span-2">Filter Sales</button>
+      </form>
+    </article>
+  </section>
+  <article class="panel">
+    <div class="panel-heading">
+      <h2>
+        Recent sales <span><button (click)="exportReport()">Export as CSV</button> </span>
+      </h2>
+      <p>Most recent checkout activity and order states.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <caption>
+          Sales data from
+          {{
+            store.detailedReportData().start | date: 'mediumDate'
+          }}
+          to
+          {{
+            store.detailedReportData().end | date: 'mediumDate'
+          }}
+        </caption>
+        <thead>
+          <tr>
+            <th>Item</th>
+
+            <th>units</th>
+            <th>cost</th>
+            <th>Price</th>
+            <th>Revenue</th>
+            <th>Total Cost</th>
+            <th>Margin(Profit)</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (sale of store.detailedReportData().data; track $index) {
+            <tr>
+              <td>
+                <strong>{{ sale.item }}</strong>
+              </td>
+
+              <td>{{ sale.units }}</td>
+              <td>{{ sale.cost | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+              <td>{{ sale.price | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+              <td>{{ sale.revenue | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+              <td>{{ sale.totalCost | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+              <td>
+                {{ sale.margin | currency: 'USD' : 'symbol' : '1.0-0' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="6"><strong>Total Revenue</strong></td>
+            <td>{{ reduceTotal('revenue') | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+          </tr>
+          <tr>
+            <td colspan="6"><strong>Total Cost</strong></td>
+            <td>{{ reduceTotal('totalCost') | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+          </tr>
+          <tr>
+            <td colspan="6"><strong>Total Margin</strong></td>
+            <td>{{ reduceTotal('margin') | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </article>
+</section>

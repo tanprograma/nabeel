@@ -21,6 +21,7 @@ export class App {
     { label: 'Purchasing', note: 'Receipts and suppliers', route: '/purchasing' },
     { label: 'Sales', note: 'Orders and channels', route: '/sales' },
     { label: 'Reports', note: 'Trends and alerts', route: '/reports' },
+    { label: 'Detailed Reports', note: 'In-depth analytics', route: '/detailed-reports' },
   ];
 
   protected readonly facts = computed(() => [

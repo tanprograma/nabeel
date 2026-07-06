@@ -31,6 +31,11 @@ export const routes: Routes = [
       import('./pages/reports-page/reports-page').then((module) => module.ReportsPage),
   },
   {
+    path: 'detailed-reports',
+    loadComponent: () =>
+      import('./pages/detailed-report/detailed-report').then((module) => module.DetailedReport),
+  },
+  {
     path: '**',
     redirectTo: 'dashboard',
   },

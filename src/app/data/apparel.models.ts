@@ -91,3 +91,13 @@ export interface ApparelSummary {
   sellThroughRate: number;
   estimatedMargin: number;
 }
+export interface DetailedReportData {
+  item: string;
+  price: number;
+  cost: number;
+  units: number;
+  stock: number;
+  revenue: number;
+  totalCost: number;
+  margin: number;
+}
