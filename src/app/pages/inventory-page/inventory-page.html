@@ -24,7 +24,7 @@
       <form [formGroup]="addProductForm" (ngSubmit)="addProduct()" class="form-grid">
         <label>
           <span>SKU</span>
-          <input type="text" formControlName="sku" />
+          <input type="text" formControlName="sku" style="text-transform: uppercase" />/>
         </label>
         <label>
           <span>Product name</span>
@@ -35,10 +35,11 @@
           <select formControlName="category">
             <option>Shirts</option>
             <option>Trousers</option>
-            <option>Outerwear</option>
+            <option>Underwear</option>
             <option>Knits</option>
-            <option>Bottoms</option>
+
             <option>Accessories</option>
+            <option>Shoes</option>
           </select>
         </label>
         <label>

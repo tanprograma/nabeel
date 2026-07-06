@@ -21,8 +21,8 @@ export class SalesPage {
   readonly saleForm = this.fb.nonNullable.group({
     productId: ['', [Validators.required]],
     channel: ['Retail'],
-    units: [4, [Validators.required, Validators.min(1)]],
-    pricePerUnit: [59, [Validators.required, Validators.min(1)]],
+    units: [1, [Validators.required, Validators.min(1)]],
+    pricePerUnit: [1, [Validators.required, Validators.min(1)]],
     state: ['Paid'],
     soldOn: [this.today, [Validators.required]],
   });
@@ -60,8 +60,8 @@ export class SalesPage {
 
     this.message.set('Sale recorded and stock updated.');
     this.saleForm.patchValue({
-      units: 4,
-      pricePerUnit: this.selectedProduct?.price ?? 59,
+      units: 1,
+      pricePerUnit: this.selectedProduct?.price ?? 1,
       state: 'Paid',
       soldOn: this.today,
     });

@@ -43,14 +43,14 @@ export class InventoryPage {
     this.store.addProduct(this.addProductForm.getRawValue() as NewProductInput);
     this.message.set('Product added to the assortment.');
     this.addProductForm.reset({
-      sku: 'AT-',
+      sku: 'NIKE-',
       name: '',
       category: 'Shirts',
       season: 'Core',
-      stock: 12,
+      stock: 1,
       reorderPoint: 10,
-      cost: 24,
-      price: 59,
+      cost: 500,
+      price: 1000,
       supplier: 'North Looms',
     });
   }
@@ -65,6 +65,6 @@ export class InventoryPage {
 
     this.store.restockProduct(productId, units);
     this.message.set('Stock has been replenished and logged as a receipt.');
-    this.restockForm.patchValue({ units: 8 });
+    this.restockForm.patchValue({ units: 1 });
   }
 }

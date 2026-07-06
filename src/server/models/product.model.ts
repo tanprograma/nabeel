@@ -3,7 +3,7 @@ import { Product } from '../../app/data/apparel.models';
 
 const ProductSchema: Schema<Product> = new Schema<Product>(
   {
-    sku: { type: String, required: true, unique: true },
+    sku: { type: String, required: true, unique: true, uppercase: true },
     name: { type: String, required: true },
     category: { type: String, required: true },
     season: { type: String },
