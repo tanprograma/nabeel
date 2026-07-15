@@ -51,17 +51,46 @@ export class ApparelStoreService {
     // snapshot: {},
   });
 
-  Notification = signal<{ fetch_status: 'success' | 'error' | 'rested'; loading: boolean }>({
+  Notification = signal<{
+    fetch_status: 'success' | 'error' | 'rested';
+    loading: boolean;
+    confirmation: boolean;
+  }>({
     fetch_status: 'rested',
     loading: false,
+    confirmation: false,
   });
+  updateConfirmation() {
+    this.Notification.update((state) => ({ ...state, confirmation: !state.confirmation }));
+    console.log(this.Notification());
+  }
+  confirmOperation() {
+    // placeholder function
+    console.log('operation confirmed');
+  }
   constructor() {
     if (this.backendSyncEnabled) {
       void this.refreshFromBackend();
     }
   }
+  inventoryFilter = signal('');
+  filterInventory(v: string) {
+    this.inventoryFilter.set(v);
+  }
+  readonly products = computed(() =>
+    this.state().products.sort((a: any, b: any) => {
+      return a.name.localeCompare(b.name);
+    }),
+  );
 
-  readonly products = computed(() => this.state().products);
+  readonly inventory = computed(() =>
+    this.products().filter((inv) => {
+      if (!this.inventoryFilter()) return true;
+      const name = inv.name.toUpperCase();
+
+      return inv.name.toUpperCase().includes(this.inventoryFilter().toUpperCase());
+    }),
+  );
   readonly purchases = computed(() => this.state().purchases);
   readonly sales = computed(() => this.state().sales);
   readonly detailedReportData = computed(() => this.state().detailedReportData);
@@ -189,6 +218,27 @@ export class ApparelStoreService {
         this.showError();
         this.retry = () => {
           this.addProduct(input);
+        };
+      });
+  }
+  deleteProduct<T>(id: string) {
+    this.showLoad();
+    this.http
+      .delete(`/api/products/${id}`)
+      .then((res) => {
+        this.state.update((state) => {
+          return {
+            ...state,
+            products: state.products.filter((p) => p._id != id),
+          };
+        });
+        console.log(res);
+        this.resetNotification();
+      })
+      .catch((err) => {
+        this.showError();
+        this.retry = () => {
+          this.deleteProduct(id);
         };
       });
   }
@@ -326,7 +376,7 @@ export class ApparelStoreService {
     }, 5000);
   }
   resetNotification() {
-    this.Notification.set({ loading: false, fetch_status: 'rested' });
+    this.Notification.set({ loading: false, fetch_status: 'rested', confirmation: false });
   }
   showError() {
     this.Notification.update((state) => ({ ...state, fetch_status: 'error' }));

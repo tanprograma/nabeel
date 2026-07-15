@@ -24,7 +24,7 @@
       <form [formGroup]="addProductForm" (ngSubmit)="addProduct()" class="form-grid">
         <label>
           <span>SKU</span>
-          <input type="text" formControlName="sku" style="text-transform: uppercase" />/>
+          <input type="text" formControlName="sku" style="text-transform: uppercase" />
         </label>
         <label>
           <span>Product name</span>
@@ -37,6 +37,7 @@
             <option>Trousers</option>
             <option>Underwear</option>
             <option>Knits</option>
+            <option>gauni</option>
 
             <option>Accessories</option>
             <option>Shoes</option>
@@ -112,7 +113,15 @@
 
   <article class="panel">
     <div class="panel-heading">
-      <h2>Product register</h2>
+      <div class="">
+        <h2>Product register</h2>
+        <input
+          type="text"
+          class="product-search"
+          placeholder="search product"
+          (keyup)="filterInventory($event)"
+        />
+      </div>
       <p>All active styles with stock, pricing, and supplier context.</p>
     </div>
 
@@ -127,10 +136,11 @@
             <th>Price</th>
             <th>Supplier</th>
             <th>Status</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
-          @for (product of store.products(); track product._id) {
+          @for (product of store.inventory(); track product._id) {
             <tr>
               <td>{{ product.sku }}</td>
               <td>
@@ -148,6 +158,9 @@
                 <span class="status" [class.critical]="product.status === 'Critical'">
                   {{ product.status }}
                 </span>
+              </td>
+              <td class="del-icon" (click)="deleteProduct(product._id)">
+                <fa-icon [icon]="delIcon" />
               </td>
             </tr>
           }

@@ -204,3 +204,13 @@ th {
     padding: 1rem;
   }
 }
+.flex {
+  display: flex;
+}
+.product-search {
+  margin-left: 5px;
+}
+.del-icon:hover {
+  color: red;
+  cursor: pointer;
+}

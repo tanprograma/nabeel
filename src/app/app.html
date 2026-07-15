@@ -1,4 +1,7 @@
-<div class="app-shell" [class.stop-overflow]="store.Notification().loading">
+<div
+  class="app-shell"
+  [class.stop-overflow]="store.Notification().loading || store.Notification().confirmation"
+>
   @if (store.Notification().loading) {
     <div
       class="spinner-container"
@@ -16,6 +19,18 @@
           <button class="notification-btn" (click)="store.resetNotification()">close</button>
         </div>
       }
+    </div>
+  }
+  @if (store.Notification().confirmation) {
+    <!-- confirmation prompt -->
+    <div class="confirmation-container">
+      <div class="confirm-box">
+        <h2>do you want to continue with the operation?</h2>
+        <div class="flex flex-center">
+          <button class="btn-yes" (click)="store.confirmOperation()">Yes</button>
+          <button class="btn-danger" (click)="store.updateConfirmation()">No</button>
+        </div>
+      </div>
     </div>
   }
   <aside class="sidebar">

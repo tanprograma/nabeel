@@ -4,15 +4,17 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { ApparelStoreService } from '../../data/apparel-store.service';
 import { NewProductInput } from '../../data/apparel.models';
-
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 @Component({
   selector: 'app-inventory-page',
-  imports: [ReactiveFormsModule, CurrencyPipe],
+  imports: [ReactiveFormsModule, CurrencyPipe, FontAwesomeModule],
   templateUrl: './inventory-page.html',
   styleUrl: './inventory-page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InventoryPage {
+  delIcon = faTrash;
   protected readonly store = inject(ApparelStoreService);
   protected readonly message = signal<string | null>(null);
   private readonly fb = inject(FormBuilder);
@@ -66,5 +68,16 @@ export class InventoryPage {
     this.store.restockProduct(productId, units);
     this.message.set('Stock has been replenished and logged as a receipt.');
     this.restockForm.patchValue({ units: 1 });
+  }
+  deleteProduct(id: string) {
+    this.store.updateConfirmation();
+    this.store.confirmOperation = () => {
+      this.store.updateConfirmation();
+      this.store.deleteProduct(id);
+    };
+  }
+  filterInventory(e: Event) {
+    const value = (e.target as HTMLInputElement).value;
+    this.store.filterInventory(value);
   }
 }

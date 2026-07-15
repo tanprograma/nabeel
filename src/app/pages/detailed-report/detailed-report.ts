@@ -22,6 +22,7 @@ export class DetailedReport {
   filterSalesReport() {
     const { start, end } = this.filterForm.value;
     // improve code by using signals
+    this.store.setReportDates(start as string, end as string);
     this.store.getDetailedReportData(start as string, end as string);
   }
   exportReport() {

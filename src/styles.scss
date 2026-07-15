@@ -43,3 +43,28 @@ textarea {
 ::selection {
   background: rgba(127, 91, 59, 0.18);
 }
+.flex {
+  display: flex;
+}
+.flex-center {
+  justify-content: center;
+  align-items: center;
+}
+.btn-yes {
+  background-color: rgb(151, 151, 220);
+  color: white;
+  border: 0;
+}
+.btn-yes:hover {
+  background-color: blue;
+  cursor: pointer;
+}
+.btn-danger {
+  background-color: rgb(236, 85, 85);
+  color: white;
+  border: 0;
+}
+.btn-danger:hover {
+  background-color: red;
+  cursor: pointer;
+}
